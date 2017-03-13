@@ -1,0 +1,48 @@
+#!/bin/bash
+# Creates folder sctructure and notes for PSI tickets
+
+# EORUBY
+parentfolder=$(
+ruby <<-EORUBY
+# Retrieve the new file's id & extract parent id for comparison
+file_name = "$1"
+parent_id = file_name[0..1]
+parent_folder = parent_id + "00"
+puts parent_folder
+EORUBY
+)
+
+does_exist=$(
+ruby <<-EORUBY
+# Retrieve the new file's id & extract parent id for comparison
+file_name = "$1"
+file_name_parent = file_name[0..1]
+
+# Retrieve the current files' parent ids
+files_ary = Dir["/Users/andrewsullivan/Desktop/Desktop/Notes/*"]
+files_ary.map! { |file|
+  file[-4..-3]
+}
+files_ary = files_ary.uniq
+
+# Check if a folder already exists for that parent
+if files_ary.include? file_name_parent
+  puts "y"
+  # Make new folder for the parent
+  # cd into folder
+  # create file
+else
+  puts "n"
+  # cd into that folder, create file
+end
+EORUBY
+)
+
+if [ $does_exist == "n" ]
+then
+  mkdir ~/Desktop/Desktop/Notes/$parentfolder
+fi
+
+mkdir ~/Desktop/Desktop/Notes/$parentfolder/PSI-$1
+cd ~/Desktop/Desktop/Notes/$parentfolder/PSI-$1
+echo $2 >> notes.rb
